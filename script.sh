@@ -16,68 +16,68 @@ curl -sfL https://raw.githubusercontent.com/reviewdog/reviewdog/master/install.s
 echo '::endgroup::'
 
 if [ "${INPUT_SKIP_INSTALL}" = "false" ]; then
-  echo '::group:: Installing rubocop with extensions ... https://github.com/rubocop/rubocop'
-  # if 'gemfile' rubocop version selected
-  if [ "${INPUT_RUBOCOP_VERSION}" = "gemfile" ]; then
+  echo '::group:: Installing erbcop with extensions ... https://github.com/r7kamura/erbcop'
+  # if 'gemfile' erbcop version selected
+  if [ "${INPUT_ERBCOP_VERSION}" = "gemfile" ]; then
     # if Gemfile.lock is here
     if [ -f 'Gemfile.lock' ]; then
-      # grep for rubocop version
-      RUBOCOP_GEMFILE_VERSION=$(ruby -ne 'print $& if /^\s{4}rubocop\s\(\K.*(?=\))/' Gemfile.lock)
+      # grep for erbcop version
+      ERBCOP_GEMFILE_VERSION=$(ruby -ne 'print $& if /^\s{4}erbcop\s\(\K.*(?=\))/' Gemfile.lock)
 
-      # if rubocop version found, then pass it to the gem install
+      # if erbcop version found, then pass it to the gem install
       # left it empty otherwise, so no version will be passed
-      if [ -n "$RUBOCOP_GEMFILE_VERSION" ]; then
-        RUBOCOP_VERSION=$RUBOCOP_GEMFILE_VERSION
+      if [ -n "$ERBCOP_GEMFILE_VERSION" ]; then
+        ERBCOP_VERSION=$ERBCOP_GEMFILE_VERSION
       else
-        printf "Cannot get the rubocop's version from Gemfile.lock. The latest version will be installed."
+        printf "Cannot get the erbcop's version from Gemfile.lock. The latest version will be installed."
       fi
     else
       printf 'Gemfile.lock not found. The latest version will be installed.'
     fi
   else
-    # set desired rubocop version
-    RUBOCOP_VERSION=$INPUT_RUBOCOP_VERSION
+    # set desired erbcop version
+    ERBCOP_VERSION=$INPUT_ERBCOP_VERSION
   fi
 
-  gem install -N rubocop --version "${RUBOCOP_VERSION}"
+  gem install -N erbcop --version "${ERBCOP_VERSION}"
 
-  # Traverse over list of rubocop extensions
-  for extension in $INPUT_RUBOCOP_EXTENSIONS; do
+  # Traverse over list of erbcop extensions
+  for extension in $INPUT_ERBCOP_EXTENSIONS; do
     # grep for name and version
-    INPUT_RUBOCOP_EXTENSION_NAME=$(echo "$extension" |awk 'BEGIN { FS = ":" } ; { print $1 }')
-    INPUT_RUBOCOP_EXTENSION_VERSION=$(echo "$extension" |awk 'BEGIN { FS = ":" } ; { print $2 }')
+    INPUT_ERBCOP_EXTENSION_NAME=$(echo "$extension" |awk 'BEGIN { FS = ":" } ; { print $1 }')
+    INPUT_ERBCOP_EXTENSION_VERSION=$(echo "$extension" |awk 'BEGIN { FS = ":" } ; { print $2 }')
 
     # if version is 'gemfile'
-    if [ "${INPUT_RUBOCOP_EXTENSION_VERSION}" = "gemfile" ]; then
+    if [ "${INPUT_ERBCOP_EXTENSION_VERSION}" = "gemfile" ]; then
       # if Gemfile.lock is here
       if [ -f 'Gemfile.lock' ]; then
-        # grep for rubocop extension version
-        RUBOCOP_EXTENSION_GEMFILE_VERSION=$(ruby -ne "print $& if /^\s{4}$INPUT_RUBOCOP_EXTENSION_NAME\s\(\K.*(?=\))/" Gemfile.lock)
+        # grep for erbcop extension version
+        ERBCOP_EXTENSION_GEMFILE_VERSION=$(ruby -ne "print $& if /^\s{4}$INPUT_ERBCOP_EXTENSION_NAME\s\(\K.*(?=\))/" Gemfile.lock)
 
-        # if rubocop extension version found, then pass it to the gem install
+        # if erbcop extension version found, then pass it to the gem install
         # left it empty otherwise, so no version will be passed
-        if [ -n "$RUBOCOP_EXTENSION_GEMFILE_VERSION" ]; then
-          RUBOCOP_EXTENSION_VERSION=$RUBOCOP_EXTENSION_GEMFILE_VERSION
+        if [ -n "$ERBCOP_EXTENSION_GEMFILE_VERSION" ]; then
+          ERBCOP_EXTENSION_VERSION=$ERBCOP_EXTENSION_GEMFILE_VERSION
         else
-          printf "Cannot get the rubocop extension version from Gemfile.lock. The latest version will be installed."
+          printf "Cannot get the erbcop extension version from Gemfile.lock. The latest version will be installed."
         fi
       else
         printf 'Gemfile.lock not found. The latest version will be installed.'
       fi
     else
-      # set desired rubocop extension version
-      RUBOCOP_EXTENSION_VERSION=$INPUT_RUBOCOP_EXTENSION_VERSION
+      # set desired erbcop extension version
+      ERBCOP_EXTENSION_VERSION=$INPUT_ERBCOP_EXTENSION_VERSION
     fi
 
     # Handle extensions with no version qualifier
-    if [ -z "${RUBOCOP_EXTENSION_VERSION}" ]; then
-      unset RUBOCOP_EXTENSION_VERSION_FLAG
+    if [ -z "${ERBCOP_EXTENSION_VERSION}" ]; then
+      unset ERBCOP_EXTENSION_VERSION_FLAG
     else
-      RUBOCOP_EXTENSION_VERSION_FLAG="--version ${RUBOCOP_EXTENSION_VERSION}"
+      ERBCOP_EXTENSION_VERSION_FLAG="--version ${ERBCOP_EXTENSION_VERSION}"
     fi
 
     # shellcheck disable=SC2086
-    gem install -N "${INPUT_RUBOCOP_EXTENSION_NAME}" ${RUBOCOP_EXTENSION_VERSION_FLAG}
+    gem install -N "${INPUT_ERBCOP_EXTENSION_NAME}" ${ERBCOP_EXTENSION_VERSION_FLAG}
   done
   echo '::endgroup::'
 fi
@@ -90,9 +90,9 @@ else
   BUNDLE_EXEC="bundle exec "
 fi
 
-echo '::group:: Running rubocop with reviewdog 🐶 ...'
+echo '::group:: Running erbcop with reviewdog 🐶 ...'
 # shellcheck disable=SC2086
-${BUNDLE_EXEC}rubocop ${INPUT_RUBOCOP_FLAGS} --require ${GITHUB_ACTION_PATH}/rdjson_formatter/rdjson_formatter.rb --format RdjsonFormatter \
+${BUNDLE_EXEC}erbcop ${INPUT_ERBCOP_FLAGS} --require ${GITHUB_ACTION_PATH}/rdjson_formatter/rdjson_formatter.rb --format RdjsonFormatter \
   | reviewdog -f=rdjson \
       -name="${INPUT_TOOL_NAME}" \
       -reporter="${INPUT_REPORTER}" \
